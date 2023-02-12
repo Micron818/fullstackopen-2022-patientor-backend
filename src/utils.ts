@@ -1,4 +1,4 @@
-import { Gender, Patient } from './types';
+import { Entry, Gender, Patient } from './types';
 
 const isString = (text: unknown): text is string => {
   return typeof text === 'string' || text instanceof String;
@@ -35,12 +35,15 @@ const parseGender = (gender: unknown): Gender => {
   return gender;
 };
 
+const parseEntries = (entries: unknown): Entry[] => entries as Entry[];
+
 export type PatientBodyFields = {
   name: unknown;
   occupation: unknown;
   gender: unknown;
   ssn: unknown;
   dateOfBirth: unknown;
+  entries?: unknown;
 };
 
 const body2Patient = ({
@@ -49,6 +52,7 @@ const body2Patient = ({
   gender,
   ssn,
   dateOfBirth,
+  entries,
 }: PatientBodyFields): Omit<Patient, 'id'> => {
   const patient: Omit<Patient, 'id'> = {
     name: parseString(name),
@@ -56,6 +60,7 @@ const body2Patient = ({
     gender: parseGender(gender),
     ssn: parseString(ssn),
     dateOfBirth: parseDate(dateOfBirth),
+    entries: parseEntries(entries),
   };
 
   return patient;
