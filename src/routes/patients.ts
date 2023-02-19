@@ -1,6 +1,8 @@
 import express from 'express';
+import { body } from 'express-validator';
 import patientsService from '../services/patientsService';
-import { body2Patient } from '../utils';
+import { body2Patient, entriesDataVerify, PatientBodyFields } from '../utils';
+import { EntryWithoutId } from './../types';
 const router = express.Router();
 
 router.get('/', (_req, res) => {
@@ -12,9 +14,13 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  const patient = body2Patient(req.body);
+  const patient = body2Patient(req.body as PatientBodyFields);
   res.json(patientsService.addPatient(patient));
+});
+
+router.post('/:id/entries', body().custom(entriesDataVerify), (req, res) => {
+  const entry = entriesDataVerify(req.body as EntryWithoutId);
+  res.json(patientsService.addEntries(entry));
 });
 
 export default { router };

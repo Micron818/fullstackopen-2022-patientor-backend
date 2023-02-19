@@ -1,4 +1,10 @@
-import { Entry, Gender, Patient } from './types';
+import {
+  Entry,
+  EntryWithoutId,
+  Gender,
+  HealthCheckRating,
+  Patient,
+} from './types';
 
 const isString = (text: unknown): text is string => {
   return typeof text === 'string' || text instanceof String;
@@ -66,4 +72,37 @@ const body2Patient = ({
   return patient;
 };
 
-export { body2Patient };
+const perseHealthCheckRating = (healthCheckRating: HealthCheckRating) => {
+  if (!Object.values(HealthCheckRating).includes(healthCheckRating))
+    throw new Error('miss or invalid healthCheckRating: ' + healthCheckRating);
+  return healthCheckRating;
+};
+
+const parseUndefind = (value: unknown) => {
+  if (!value) throw new Error('miss required value');
+  return 'undefind';
+};
+
+const entriesDataVerify = (entry: EntryWithoutId) => {
+  if (!(entry.description && entry.date && entry.specialist))
+    throw new Error('miss required value');
+  switch (entry.type) {
+    case 'HealthCheck': {
+      perseHealthCheckRating(entry.healthCheckRating);
+      break;
+    }
+    case 'Hospital': {
+      parseUndefind(entry.discharge);
+      break;
+    }
+    case 'OccupationalHealthcare': {
+      parseString(entry.employerName);
+      break;
+    }
+    default:
+      break;
+  }
+  return entry;
+};
+
+export { body2Patient, entriesDataVerify };
